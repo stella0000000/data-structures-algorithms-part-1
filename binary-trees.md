@@ -1,6 +1,6 @@
 ## BINARY TREE
 
-### Node Class for Binary Tree
+### Node Class
 ```javascript
 class Node {
   constructor(val) {

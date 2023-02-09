@@ -26,6 +26,7 @@ const printIterative = (head) => {
 ```javascript
 const printRecursive = (head) => {
   if (head === null) return
+  
   console.log(head)
   printRecursive(head.next)
 }
