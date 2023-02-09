@@ -6,11 +6,11 @@ const dfsIterative = (graph, source) => {
   const stack = [ source ]
 
   while (stack.length > 0) {
-    const curr = stack.pop()
+    const node = stack.pop()
 
-    console.log(curr)
+    console.log(node)
 
-    for (let neighbor of graph[curr]) {
+    for (let neighbor of graph[node]) {
       stack.push(neighbor)
     }
   }
@@ -34,11 +34,11 @@ const bfsIterative = (graph, source) => {
   const queue = [ source ]
 
   while (queue.length > 0) {
-    const curr = queue.shift()
+    const node = queue.shift()
 
-    console.log(curr)
+    console.log(node)
     
-    for (let neighbor of graph[curr]) {
+    for (let neighbor of graph[node]) {
       queue.push(neighbor)
     }
   }
