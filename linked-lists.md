@@ -12,7 +12,7 @@ class Node {
 
 ### 
 ```javascript
-const printIterative = (head) => {
+const printValsIterative = (head) => {
   let curr = head
 
   while (curr !== null) {
@@ -24,7 +24,8 @@ const printIterative = (head) => {
 
 ### 
 ```javascript
-const printRecursive = (head) => {
+const printValsRecursive = (head) => {
+  // base case => i.e. "when are we done?"
   if (head === null) return
   
   console.log(head)

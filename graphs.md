@@ -28,7 +28,7 @@ const dfsRecursive = (graph, source) => {
 }
 ```
 
-### BFS Iterative
+### BFS Iterative (shortest path)
 ```javascript
 const bfsIterative = (graph, source) => {
   const queue = [ source ]
@@ -45,9 +45,27 @@ const bfsIterative = (graph, source) => {
 }
 ```
 
-
-### 
+### Build  adjacency list with edges[]
 ```javascript
+const buildGraph = (edges) => {
+  const graph = {}
+
+  for (let edge of edges) {
+    let [a, b] = edge
+
+    // * DIRECTED *
+    if (!graph[a]) graph[a] = []
+    graph[a].push(b)
+
+    // * UNDIRECTED *
+    // if (!graph[a]) graph[a] = []
+    // if (!graph[b]) graph[b] = []
+    // graph[a].push(b)
+    // graph[b].push(a)
+  }
+
+  return graph
+}
 ```
 
 ### 
