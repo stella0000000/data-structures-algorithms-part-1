@@ -1,4 +1,4 @@
-## LINKED LIST
+## SINGLYLINKED LIST
 
 ### Node Class
 ```javascript
@@ -30,6 +30,19 @@ const printValsRecursive = (head) => {
   
   console.log(head)
   printRecursive(head.next)
+}
+```
+
+## DOUBLY LINKED LIST
+
+### Node Class
+```javascript
+class Node {
+  constructor(val, prev, val) {
+    this.val = val
+    this.prev = null
+    this.next =  null
+  }
 }
 ```
 
