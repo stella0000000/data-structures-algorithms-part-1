@@ -227,6 +227,34 @@ class Leaderboard {
 ```javascript
 ```
 
+### 797 All Paths From Source to Target
+```javascript
+const allPathsSourceTarget = (graph) => {
+  // directed acyclic graph
+  // all possible paths from node 0 to node n-1
+
+  // DFS recursive
+  const allPaths = []
+  findPaths(0, graph, allPaths, [])   // source node, graph, allPaths[], initial currPaths[]
+  return allPaths
+}
+
+const findPaths = (currNode, graph, allPaths, currPaths) => {
+    currPaths.push(currNode)
+
+    if (currNode === graph.length-1) {
+        allPaths.push(currPaths)
+        return
+    }
+
+    for (let neighbor of graph[currNode]) {
+        findPaths(neighbor, graph, allPaths, [...currPaths])  // WHY destructure
+    }
+
+    return allPaths
+}
+```
+
 ### 394 Decode String
 ```javascript
 /**
