@@ -322,6 +322,42 @@ class Leaderboard {
 
 ### 1236 Web Crawler
 ```javascript
+
+```
+
+### 1823 Find the Winner of the Circular Game
+```javascript
+const findTheWinner = (n, k) => {
+  // n friends playing a game
+  // sitting in circle range(1, n) clockwise
+  // k friends in clockwise direction
+      // including start friend
+      // counting wraps around circle
+      // friends may be counted 1x+
+      // last friend counted leaves circle + loses
+  // if friends remain
+      // go back to step 2
+  
+  // Build queue
+  const queue = []
+  for (let i=1; i<=n; i++) queue.push(i)
+
+  while (queue.length > 1) {
+    let deleteCount = k
+    while (deleteCount > 1) {    // want 1 person remaining
+      deleteCount--
+      queue.push(queue.shift())  // rotate
+    }
+    queue.shift()                // delete Kth ele
+  }
+
+  return queue[0]                // winner
+}
+
+```
+
+### 1472 Design Browser History
+```javascript
 class Node {
   // Doubly linked list
   constructor(val, next, prev) {
@@ -362,41 +398,6 @@ class BrowserHistory {
     return this.curr.val
   }
 }
-```
-
-### 1823 Find the Winner of the Circular Game
-```javascript
-const findTheWinner = (n, k) => {
-  // n friends playing a game
-  // sitting in circle range(1, n) clockwise
-  // k friends in clockwise direction
-      // including start friend
-      // counting wraps around circle
-      // friends may be counted 1x+
-      // last friend counted leaves circle + loses
-  // if friends remain
-      // go back to step 2
-  
-  // Build queue
-  const queue = []
-  for (let i=1; i<=n; i++) queue.push(i)
-
-  while (queue.length > 1) {
-    let deleteCount = k
-    while (deleteCount > 1) {    // want 1 person remaining
-      deleteCount--
-      queue.push(queue.shift())  // rotate
-    }
-    queue.shift()                // delete Kth ele
-  }
-
-  return queue[0]                // winner
-}
-
-```
-
-### 1472 Design Browser History
-```javascript
 ```
 
 ### 
