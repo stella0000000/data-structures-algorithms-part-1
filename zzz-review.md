@@ -386,6 +386,26 @@ const findPaths = (currNode, graph, allPaths, currPaths) => {
 
 ```
 
+### 1274 Number of Ships in a Rectangle
+```javascript
+const countShips = (sea, topRight, bottomLeft) => {
+  // Sea.hasShips(topRight, bottomLeft) => boolean
+
+  if (!sea.hasShips(topRight, bottomLeft)) return 0
+  if (topRight[0] === bottomLeft[0] && topRight[1] === bottomLeft[1]) return 1
+  
+  const midX = Math.floor((topRight[0] + bottomLeft[0]) / 2)
+  const midY = Math.floor((topRight[1] + bottomLeft[1]) / 2)
+  
+  const bottomLeftQuad = countShips(sea, [midX, midY], bottomLeft)
+  const bottomRightQuad = countShips(sea, [topRight[0], midY], [midX + 1, bottomLeft[1]])
+  const topLeftQuad = countShips(sea, [midX, topRight[1]], [bottomLeft[0], midY + 1])
+  const topRightQuad = countShips(sea, topRight, [midX + 1, midY + 1])
+  
+  return bottomLeftQuad + bottomRightQuad + topLeftQuad + topRightQuad
+};
+```
+
 
 ### 1583 Count Unhappy Friends
 ```javascript
@@ -400,26 +420,34 @@ const findPaths = (currNode, graph, allPaths, currPaths) => {
       // u: x > v
   // return num of unhappy friends
 
-  let rankMap = {}
-
-  // how they ranked the person they're paired with
-  for (const [i,j] of pairs) {
+  // create a rankingMap
+  // of [person]: how they ranked their pair
+  const rankMap = {}
+  for (const [i, j] of pairs) {
       rankMap[i] = preferences[i].indexOf(j)
       rankMap[j] = preferences[j].indexOf(i)
   }
 
   let unhappy = 0
-
+  // loop through each person
   for (let person=0; person<preferences.length; person++) {
-      for (let rank=0; rank<rankMap[person]; rank++) {
-          const partner = preferences[person][rank]
+
+      // check up to the ranking of their actual pair
+      for (let ranking=0; ranking<rankMap[person]; ranking++) {
+
+          // go up peron's preferences
+          const partner = preferences[person][ranking]
+
+          // homie is unhappy if
+          // ideal partner's pair is ranked later
+          // than how I ranked ideal partner
           if (rankMap[partner] > preferences[partner].indexOf(person)) {
               unhappy++
-              break
+              break   // they're already unhappy, it's done
           }
       }
   }
-  
+
   return unhappy
 ```
 
