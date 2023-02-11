@@ -12,15 +12,18 @@ const twoCitySchedCost = (costs) => {
   // sorting by (costA - costB) => send first half to A
   // sorted will result in 0 deviation to center
   // if A > B, ++ (end of the arr), so send first half to A
-
+  const aIdx = 0
+  const bIdx = 1
   const mid = costs.length / 2
   let sum = 0
 
   for (let i=0; i<sorted.length; i++) {
       if (i < mid) {
-          sum += sorted[i][0]
+          // sum += sorted[i][0]
+          sum += sorted[i][aIdx]
       } else {
-          sum += sorted[i][1]
+          sum += sorted[i][bIdx]
+          // sum += sorted[i][1]
       }
   }
 
@@ -30,41 +33,47 @@ const twoCitySchedCost = (costs) => {
 
 ### 380 Insert Delete GetRandom O(1)
 ```javascript
-class RandomizedSet() {
-  constructor() {
-    // key is arr[idx]: val is idx
-    this.map = new Map()
-    this.arr = new Array()
-  }
+class RandomizedSet {
+    constructor() {
+        this.arr = new Array()
+        this.map = new Map()
+        // { arr[idx]: idx}
+    }
 
-  insert(val) {
-    if (this.map.has(val)) return false
+    insert(val) {
+        if (this.map.has(val)) return false
+        this.arr.push(val)
+        this.map.set(val, this.arr.length-1)
+        return true
+    }
 
-    this.arr.push(val)
-    this.map.set(val, this.arr.length-1)
-    return true
-  }
+    remove(val) {
+        if (!this.map.has(val)) return false
+        const idx = this.map.get(val);
 
-  remove(val) {
-    if (!this.map.has(val)) return false
+        // swap last arr val + arr[idx] @ val
+        [this.arr[idx], this.arr[this.arr.length-1]] = [this.arr[this.arr.length-1], this.arr[idx]]
+        // [ arr[idx], arr[last] ]
+        // [ arr[last, arr[idx] ]
 
-    // idx @ this val
-    let idx = this.map.get(val);
-    // swap arr[idx] with arr[lastIdx]
-    [this.arr[idx], this.arr[this.arr.length-1]] = [this.arr[this.arr.length-1], this.arr[idx]]
-    // update map from arr swap
-    this.map(this.arr[idx], idx)
 
-    // now val is @ end of arr => pop
-    this.arr.pop()
-    // delete entry @ val
-    this.map.delete(val)
+        // adjust map from arr swap
+        this.map.set(this.arr[idx], idx)
+        
+        // finally remove
+        this.arr.pop()
+        this.map.delete(idx)
+        return true
+    }
 
-    return true
-  }
+    getRandom() {
+        const random = Math.floor(Math.random()*this.arr.length)
+        return this.arr[random]
+    }
+}
 
   getRandom() {
-    const random = Math.floor(Math.random()*arr.length)
+    const random = Math.floor(Math.random()*this.arr.length)
     return this.arr[random]
   }
 }
@@ -75,36 +84,40 @@ class RandomizedSet() {
 class UndergroundSystem {
     constructor() {
         this.customer = {}
-        // [id] = startStation, startTime
+        // { id: [startStation, startTime] }
+
         this.avgs = {}
-        // running avgs
-        // startStation-endStation: [ totalTime, numTrips ]
+        // { startStation-endStation: [ totalTime, numTrips ] }
     }
 
     checkIn(id, stationName, t) {
         this.customer[id] = [ stationName, t ]
     }
 
+    // get start info from this.customer[id]
+    // add to avgs{}
     checkOut(id, stationName, t) {
         const [ startStation, startTime ] = this.customer[id]
-        let key = `${startStation}-${stationName}`
-        let totalTime = t - startTime
+        const [ endStation, endTime ] = [ stationName, t ]
 
-        if (!this.avg[key]) {
-            this.avg[key] = [ totalTime, 1 ]
-        } else {
-            const [ prevTotal, prevNumTrips ] = this.avg[key]
-            this.avg[key] = [ prevTotal+totalTime, prevNumTrips+1]
+        const key = `${startStation}-${endStation}`
+        const totalTime = endTime - startTime
+
+        // check if we have this route in avgs
+        if (this.avgs[key]) {
+            const [ time, numTrips ] = this.avgs[key]
+            this.avgs[key] = [ totalTime+time, numTrips+1]
+
+        } else { // if not, it's the first trip
+            const numTrips = 1
+            this.avgs[key] = [ totalTime, numTrips ]
         }
     }
 
+    // avg: { startS-endS: [totalTime, numTrips]}
     getAverageTime(startStation, endStation) {
-        let key = `${startStation}-${endStation}`
-
-        if (this.avg[key]) {
-          const [ totalTime, numTrips] = this.avg[key]
-          return totalTime / numTrips
-        }
+        const [ totalTime, numTrips ] = this.avgs[`${startStation}-${endStation}`]
+        return totalTime / numTrips
     }
 }
 
@@ -121,20 +134,20 @@ class UndergroundSystem {
 ```javascript
 class OrderedStream {
   constructor(n) {
-    this.stream = {}
-    this.current = 1  // idKey starts @ 1
+      this.stream = {}
+      this.currId = 1
   }
 
   insert(idKey, value) {
-    this.stream[idKey] = value
-    const chunkToSend = []
+      this.stream[idKey] = value
+      const sendable = []
 
-    while (this.stream[this.current]) {
-      chunkToSend.push(this.stream[this.current])
-      this.current++
-    }
+      while (this.stream[this.currId]) {
+          sendable.push(this.stream[this.currId])
+          this.currId++
+      }
 
-    return chunkToSend
+      return sendable
   }
 }
 ```
@@ -173,9 +186,11 @@ const invalidTransactions = (transactions) => {
     }
   }
 
-  for (let k=0; k<invalidFlags.length; k++) {
-    if (invalidFlags[k]) res.push(transactions[k])
-  }
+  // for (let k=0; k<invalidFlags.length; k++) {
+  //   if (invalidFlags[k]) res.push(transactions[k])
+  // }
+
+  invalidFlags.map((flag, key) => flag ? res.push(transactions[key]) : null)
 
   return res
 }
@@ -187,6 +202,31 @@ const invalidTransactions = (transactions) => {
 
 ### 253 Meeting Rooms II
 ```javascript
+const minMeetingRooms = (intervals) => {
+  // sorted arr of startTimes
+  // sorted arr of endTimes
+  // compare startTimes + endTimes
+      // start pointer + end pointer
+  // increment count if startTime[startIdx] < endTime[endIdx]
+      // i.e. if another starts before one ends
+      
+  const startTimes = intervals.map(int => int[0]).sort((a, b) => a-b)
+  // [ 0, 5, 15 ]
+  const endTimes = intervals.map(int => int[1]).sort((a, b) => a-b)
+  // [ 10, 20, 30 ]
+
+  let startIdx = 0
+  let endIdx = 0
+  let count = 0
+
+  while (startIdx < intervals.length) {
+    (startTimes[startIdx] < endTimes[endIdx]) ? count++ : endIdx
+    startIdx++
+  }
+
+  return count
+}
+
 ```
 
 ### 1244 Design a Leaderboard
@@ -194,26 +234,23 @@ const invalidTransactions = (transactions) => {
 class Leaderboard {
   constructor() {
       this.map = {}
+      // { playerId: score }
   }
 
   addScore(playerId, score) {
-      if (this.map[playerId]) {
-          this.map[playerId] += score
-      } else {
-          this.map[playerId] = score
-      }
+      // if (this.map[playerId]) {
+      //     this.map[playerId] += score
+      // } else {
+      //     this.map[playerId] = score
+      // }
+
+      this.map[playerId] = this.map[playerId]+score || score
   }
 
   top(K) {
       const scores = Object.values(this.map).sort((a,b) => b-a)
       let sum = 0
-      let idx = 0
-      
-      while(idx < K) {
-          sum += scores[idx]
-          idx++
-      }
-
+      for (let i=0; i<K; i++) sum += scores[i]
       return sum
   }
 
@@ -225,6 +262,61 @@ class Leaderboard {
 
 ### 1209 Remove All Adjacent Duplicates in String II
 ```javascript
+const removeDuplicates = (s, k) => {
+  // stack LIFO
+  const stack = []
+  // [ letter, numOccurance ] => [ [a, 3], [b, 1] ] sorta vibe
+
+  for (const char of s) {
+      if (!stack.length) {
+          stack.push( [ char, 1 ] ) // empty stack, so just push
+          // break // jk
+          continue
+      }
+
+      // we have stuff in our stack, let's check them
+      const [ prevChar, prevCount ] = stack[stack.length-1]
+      if (char !== prevChar) { // new letter to consider
+          stack.push( [ char, 1 ] )
+      } else {    // same chars, do fancy things
+          let newCount = prevCount + 1
+
+          if (newCount === k) {
+              stack.pop() // delete them
+          } else {
+              stack[stack.length-1][1] = newCount // update count!!!! [1]
+          }
+      }
+  }
+
+  return stack.map(arr => arr[0].repeat(arr[1])).join('')
+
+//   const stack = [] // [[a, 1], [b, 2]]
+  
+//   for (const char of s) {
+//     if (!stack.length) {
+//       stack.push([char, 1])
+//       continue
+//     }
+
+//     const [prevChar, prevCount] = stack[stack.length-1]
+
+//     if (char !== prevChar) { // new letter
+//       stack.push([char, 1])
+//     } else {                 // prevChar === char
+//       let count = prevCount + 1
+
+//       if (count === k) {
+//         stack.pop()
+//       } else {
+//         stack[stack.length-1][1] = count
+//       }
+//     }
+//   }
+
+//   return stack.map(arr => arr[0].repeat(arr[1])).join('')
+}
+
 ```
 
 ### 797 All Paths From Source to Target
@@ -342,6 +434,31 @@ const findPaths = (currNode, graph, allPaths, currPaths) => {
 
 ### 140 Word Break II
 ```javascript
+const wordBreak = (s, wordDict) => {
+  // trie, dynamic, {}, backtracking
+
+  const wordSet = new Set(wordDict);/* Time O(N)   | Space O(N) */
+  return canBreak(s, wordSet);      /* Time O(2^N) | Space O(N) */
+
+  var canBreak = (s, wordSet, start = 0) => {
+    const isBaseCase = (start === s.length);
+    if (isBaseCase) return true;
+
+    return dfs(s, wordSet, start); /* Time O(2^N) | Space O(N) */
+  }
+
+  var dfs = (s, wordSet, start) => {
+    for (let end = (start + 1); end <= s.length; end++) {/* Time O(N) */
+      const word = s.slice(start, end);                    /* Time O(N)   | Space O(N) */
+
+      const _canBreak = wordSet.has(word)
+          && canBreak(s, wordSet, end);                    /* Time O(2^N) | Space O(N) */
+      if (_canBreak) return true;
+    }
+
+    return false;
+  }
+}
 ```
 
 ### 1347 Minimum Number of Steps to Make Two Strings Anagram
