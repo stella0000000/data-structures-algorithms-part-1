@@ -429,17 +429,29 @@ const findPaths = (currNode, graph, allPaths, currPaths) => {
 ```javascript
 const countShips = (sea, topRight, bottomLeft) => {
   // Sea.hasShips(topRight, bottomLeft) => boolean
-
   if (!sea.hasShips(topRight, bottomLeft)) return 0
   if (topRight[0] === bottomLeft[0] && topRight[1] === bottomLeft[1]) return 1
-  
+
+  // topRight [x0, y0]
+  // bottomLeft [x1, y1]
   const midX = Math.floor((topRight[0] + bottomLeft[0]) / 2)
   const midY = Math.floor((topRight[1] + bottomLeft[1]) / 2)
+  /*
+
+  [                 tR[0], tR[1]
+
+
+              mX, mY
+
+
+  bL[0], bL[1]                  ]
+
+  */
   
   const bottomLeftQuad = countShips(sea, [midX, midY], bottomLeft)
-  const bottomRightQuad = countShips(sea, [topRight[0], midY], [midX + 1, bottomLeft[1]])
-  const topLeftQuad = countShips(sea, [midX, topRight[1]], [bottomLeft[0], midY + 1])
-  const topRightQuad = countShips(sea, topRight, [midX + 1, midY + 1])
+  const bottomRightQuad = countShips(sea, [topRight[0], midY], [midX+1, bottomLeft[1]])
+  const topLeftQuad = countShips(sea, [midX, topRight[1]], [bottomLeft[0], midY+1])
+  const topRightQuad = countShips(sea, topRight, [midX + 1, midY + 1])   
   
   return bottomLeftQuad + bottomRightQuad + topLeftQuad + topRightQuad
 };
@@ -756,28 +768,54 @@ class BrowserHistory {
 ### 146 LRU Cache
 ```javascript
 class LRUCache {
-  constructor(capacity) {
-      this.capacity = capacity
-      this.cache = new Map()
-  }
+    constructor(capacity) {
+        this.capacity = capacity
+        this.map = new Map()
+        // this.capacity = 3
+        // this.cache = { 1: a, 2: b, 3: c }
+        // LRU => MRU
+        // if we add, and @ capacity
+            // eject LRU, 1: a
+        // { 2: b, 3: c, 4: d}
+            // 2: b is LRU
+    }
 
-  get(key) {
-      const val = this.cache.get(key)
-      if (val === undefined) return -1
-      this.cache.delete(key)
-      this.cache.set(key, val)
-      
-      return val
-  }
+    get(key) {
+        if (!this.map.has(key)) {
+            return -1
+        } else {
+            let val = this.map.get(key)
+            this.map.delete(key)
+            this.map.set(key, val)
+            return val
+        }
 
-  put(key, value) {
-      if (this.cache.size >= this.capacity && !this.cache.has(key)) {
-          const oldKey = this.cache.keys().next().value
-          this.cache.delete(oldKey)
-      } 
-      this.cache.delete(key)
-      this.cache.set(key, value)
-  }
+        // get an element
+        // delete it
+        // add it back on - to the end
+    }
+
+    // update val of key if key exists
+    // else add key-val pair to cache
+    // if num keys > capacity
+    put(key, value) {
+        // if it exists
+            // get the element
+            // auto shift everything else over
+            // add element to end MRU
+            // change the value
+        if (this.get(key) === -1) { // we don't have this value yet
+            if (this.map.size === this.capacity) {
+                // delete the first one (i.e. LRU)
+                for (const val of this.map) {
+                    this.map.delete(val[0])
+                    break
+                }
+            }
+            
+            this.map.set(key, value)
+        }
+    }
 }
 ```
 
