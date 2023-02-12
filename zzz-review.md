@@ -510,6 +510,41 @@ const countShips = (sea, topRight, bottomLeft) => {
 
 ### 723 Candy Crush
 ```javascript
+// getEliminations => true flags for cells to eliminate
+  // initialize new board (all false) of the same size as initial board
+  // loop through board, and see where we can eliminate candies
+    // horizontally 3+
+      // flag true
+    // vertically 3+
+      // flag true
+  // return this canEliminateBoard
+
+// applyEliminations => change to 0
+  // where eliminationsBoard is true
+  // change original board to 0
+
+// dropCandies => move 0's to the top of the board
+  // loop columns UPward
+    // new arr push in non-zeroes first
+    // fill rest of arr to 0
+    // set board col to new col
+
+/*
+const candyCrush = (board) => {
+  const eliminatedBoard = getEliminations(board)
+
+  while (true) {
+    if (applyEliminations(eliminationsBoard, board)) {
+      dropCandies(board)
+    } else {
+      break
+    }
+  }
+
+  return board
+}
+
+*/
 const getEliminations = = (board) => {
   const eliminate = board.map(row => new Array(row.length).fill(false))
 
