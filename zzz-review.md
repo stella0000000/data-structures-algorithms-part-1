@@ -199,27 +199,28 @@ const invalidTransactions = (transactions) => {
 ### 430 Flatten a Multilevel Doubly Linked List
 ```javascript
 const flatten = (head) => {
-  // DFS
+  // DFS => stack
   if (!head) return null
 
   let curr = head
   const stack = []
 
   while (curr !== null) {
-      if (curr.child) {
-          if (curr.next) stack.push(curr.next)
-          curr.next = curr.child
-          curr.next.prev = curr
-          curr.child = null
-      } else if (curr.next === null && stack.length) {
-          // no next, but we have on stack..
-          curr.next = stack.pop()
-          curr.next.prev = curr
-      }
-      
-      curr = curr.next
+    if (curr.child) {
+      if (curr.next) stack.push(curr.next)  // reserve in stack
+      curr.next = curr.child
+      curr.next.prev = curr
+      curr.child = null  // taken care of
+    } else if (curr.next === null && stack.length) {
+      // no next, but nodes remain from previous iterations
+      curr.next = stack.pop()
+      curr.next.prev = curr
+    }
+
+    // increment curr
+    curr = curr.next
   }
-  
+
   return head
 }
 ```
@@ -666,7 +667,6 @@ const crawl = (startUrl, htmlParser) => {
     }
   }
 
-  // console.log([...set.values()])
   return [...set.values()]
 
 
