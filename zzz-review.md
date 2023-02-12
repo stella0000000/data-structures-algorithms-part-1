@@ -198,6 +198,30 @@ const invalidTransactions = (transactions) => {
 
 ### 430 Flatten a Multilevel Doubly Linked List
 ```javascript
+const flatten = (head) => {
+  // DFS
+  if (!head) return null
+
+  let curr = head
+  const stack = []
+
+  while (curr !== null) {
+      if (curr.child) {
+          if (curr.next) stack.push(curr.next)
+          curr.next = curr.child
+          curr.next.prev = curr
+          curr.child = null
+      } else if (curr.next === null && stack.length) {
+          // no next, but we have on stack..
+          curr.next = stack.pop()
+          curr.next.prev = curr
+      }
+      
+      curr = curr.next
+  }
+  
+  return head
+}
 ```
 
 ### 253 Meeting Rooms II
@@ -361,27 +385,42 @@ const findPaths = (currNode, graph, allPaths, currPaths) => {
             => prevStr, and prevNum from stack
             => add prevStr (prevNum times) to currStr
  */
+  // initialize stack [ [ letter, numOfOccurance]]
+    // track currStr, currNum
+    // iterate through string
+    // if
+        // '[' start sequence
+            // push [currStr, currNum] to stack
+            // reset currStr, currNum
+        // ']' end sequence
+            // pop prevBuiltStr, prevNum
+            // currStr = prevStr + currStr.repeat(prevNum)
+        // letter
+            // add to running currStr
+        // number
+            // append to running currNum
+
+  // return currStr
+  const numbers = '0123456789'
   const stack = []
   let currNum = 0
   let currStr = ''
 
-  for (let i=0; i<s.length; i++) {
-      if (s[i] === '[') {
-          stack.push(currStr)
-          stack.push(currNum)
-          currStr = ''
-          currNum = 0
-      } else if (s[i] === ']') {
-          let prevNum = stack.pop()
-          let prevStr = stack.pop()
-          currStr = prevStr + currStr.repeat(prevNum)
-      } else if (!isNaN(s[i])) {    // string = Number
-          currNum = currNum * 10 + Number(s[i])
-          console.log(s[i])
-      } else {                      // str
-          currStr += s[i]
-      }
+  for (const char of s) {
+    if (char === '[') {
+        stack.push([ currStr, currNum ])
+        currStr = ''
+        currNum = 0
+    } else if (char === ']') {
+        const [ runningStr, runningNum ] = stack.pop()
+        currStr = runningStr + currStr.repeat(runningNum)
+    } else if (numbers.includes(char)) {
+        currNum = currNum*10 + Number(char)
+    } else {    // char is a letter
+        currStr += char
+    }
   }
+
   return currStr
 
 ```
@@ -432,18 +471,18 @@ const countShips = (sea, topRight, bottomLeft) => {
   // loop through each person
   for (let person=0; person<preferences.length; person++) {
 
-      // check up to the ranking of their actual pair
+      // check up to the ranking of my actual pair
+      // i'm is unhappy if
+        // my first choice partner ranked THEIR partner later than me
+            // rankMap[partner] > preferences[partner].indexOf(me)
+        // loop through rankings up to who i'm paired with
       for (let ranking=0; ranking<rankMap[person]; ranking++) {
 
-          // go up peron's preferences
+          // go up person's preferences
           const partner = preferences[person][ranking]
-
-          // homie is unhappy if
-          // ideal partner's pair is ranked later
-          // than how I ranked ideal partner
           if (rankMap[partner] > preferences[partner].indexOf(person)) {
               unhappy++
-              break   // they're already unhappy, it's done
+              break   // they're already unhappy, avoid double counting
           }
       }
   }
@@ -458,6 +497,109 @@ const countShips = (sea, topRight, bottomLeft) => {
 
 ### 723 Candy Crush
 ```javascript
+const getEliminations = = (board) => {
+  const eliminate = board.map(row => new Array(row.length).fill(false))
+
+  // in a loop board[row][col]
+      // find all eliminations and replace with 0
+      // did Eliminate ? drop candies : break
+  for (let row=0; row<board.length; row++) {
+    for (let col=0; col<board[row].length; col++) {
+      // let currPosition = board[row][col]
+      let startCol = col
+      let endCol = col
+
+      // horizontally (col++) by row
+      while (endCol<board[row].length
+              && board[row][startCol] === board[row][endCol]
+              && board[row][startCol] !== 0) {
+        endCol++
+      }
+
+      // if we find at least 3 matching, contiguous subarrays
+      // eliminate[row, col], and corresponding cells => true
+      if (endCol-startCol >= 3) {
+        for (let elimCol=startCol; elimCol<endCol; elimCol++) {
+          eliminate[row][elimCol] = true
+        }
+      }
+    }
+  }
+
+  for (let col=0; col<board[0].length; col++) {
+    for (let row=0; row<board.length; row++) {
+      let startRow = row
+      let endRow = row
+
+      // move vertically (row++) by col
+      while (endRow<board.length 
+          && board[startRow][col] === board[endRow][col]
+          && board[startRow][col] !== 0) {
+        endRow++
+      }
+
+      // if we find at least 3 matching, contiguous subarrays
+      // eliminate[row, col], and corresponding cells => true
+      if (endRow-startRow >= 3) {
+        for (let elimRow=startRow; elimRow<endRow; elimRow++) {
+          eliminate[elimRow][col] = true
+        }
+      }
+    }
+  }
+
+  return eliminate; //[ [] [] [] ]
+}
+
+// Returns true if we flip ANYTHING to 0
+const applyEliminations = (board, eliminations) => {
+    let didFlip = false
+    for (let row=0; row<eliminations.length; row++) {
+      for (let col=0; col<eliminations[row].length; col++) {
+        if (eliminations[row][col]) {
+          didFlip = true
+          board[row][col] = 0
+        }
+      }
+    }
+
+    return didFlip
+}
+
+// Takes a board, for any 0s below non-zero squares, drop the column above it.
+const dropSquares = = (board) => {
+    // travel vertically by col
+    // start from bottom
+    for (let col=board[0].length-1; col>=0; col--) {
+        const newCol = []
+        for (let row=board.length-1; row>=0; row--) {
+            if (board[row][col] !== 0) {
+                // get all non-zeros in order board[row]= non-zeros, and append 0's to match height
+                newCol.push(board[row][col])
+            }
+        }
+        while (board.length > newCol.length) {
+            newCol.push(0)
+        }
+        for (let row=0; row<board.length; row++) {
+            board[row][col] = newCol.pop()
+        }
+    }
+}
+
+const candyCrush = (board) => {
+    while (true) {
+        const eliminations = getEliminations(board);
+        if (applyEliminations(board, eliminations)) {
+            // Then we have to do drops
+            dropSquares(board);
+        } else {
+            break
+        }
+    }
+
+    return board
+};
 ```
 
 ### 140 Word Break II
@@ -495,6 +637,44 @@ const wordBreak = (s, wordDict) => {
 
 ### 1236 Web Crawler
 ```javascript
+const crawl = (startUrl, htmlParser) => {
+  // breadth first search => queue
+  const hostname = startUrl.split('/')[2]
+  const getHostname = (url) => url.split('/')[2]
+  const set = new Set([startUrl])
+  const queue = [ startUrl ]        // start the q, urls to htmlpar
+
+  while (queue.length) {
+    let currUrl = queue.shift()
+    for (const url of htmlParser.getUrls(currUrl)) {
+      if (!set.has(url) && getHostname(url).includes(hostname)) {
+        set.add(url)
+        queue.push(url)
+      }
+    }
+  }
+
+  // console.log([...set.values()])
+  return [...set.values()]
+
+
+  // depth first search => recursive
+  //   const hostname = startUrl.split('/')[2]
+  //   const getHostname = (url) => url.split('/')[2]
+  //   const set = new Set([startUrl])
+
+  //   const DFS = (currUrl) => {
+  //     for (const url of htmlParser.getUrls(currUrl)) {
+  //       if (!set.has(url) && getHostname(url).includes(hostname)) {
+  //         set.add(url)
+  //         DFS(url)
+  //       }
+  //   }
+  // }
+
+  //   DFS(startUrl)
+  //   return [...set.values()]
+}
 
 ```
 
@@ -573,8 +753,32 @@ class BrowserHistory {
 }
 ```
 
-### 
+### 146 LRU Cache
 ```javascript
+class LRUCache {
+  constructor(capacity) {
+      this.capacity = capacity
+      this.cache = new Map()
+  }
+
+  get(key) {
+      const val = this.cache.get(key)
+      if (val === undefined) return -1
+      this.cache.delete(key)
+      this.cache.set(key, val)
+      
+      return val
+  }
+
+  put(key, value) {
+      if (this.cache.size >= this.capacity && !this.cache.has(key)) {
+          const oldKey = this.cache.keys().next().value
+          this.cache.delete(oldKey)
+      } 
+      this.cache.delete(key)
+      this.cache.set(key, value)
+  }
+}
 ```
 
 ### 
