@@ -23,8 +23,8 @@ const dfsIterativve = (root) => {
     const node = stack.pop()
     vals.push(node.val)
 
-    if (!!node.right) stack.push(node.right)
-    if (!!node.left) stack.push(node.left)  // LIFO
+    if (node.right) stack.push(node.right)
+    if (node.left) stack.push(node.left)  // LIFO
   }
 
   return vals
@@ -55,8 +55,8 @@ const bfsIterative = (root) => {
     const node = queue.shift()
     vals.push(node.val)
 
-    if (!!node.right) queue.push(node.right) // FIFO
-    if (!!node.left) queue.push(node.left)
+    if (node.right) queue.push(node.right) // FIFO
+    if (node.left) queue.push(node.left)
   }
 
   return vals
