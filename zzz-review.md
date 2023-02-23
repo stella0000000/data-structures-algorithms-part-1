@@ -710,7 +710,8 @@ const crawl = (startUrl, htmlParser) => {
   //   const getHostname = (url) => url.split('/')[2]
   //   const set = new Set([startUrl])
 
-  //   const DFS = (currUrl) => {
+  //   const DFS = (currUrlgeta
+  
   //     for (const url of htmlParser.getUrls(currUrl)) {
   //       if (!set.has(url) && getHostname(url).includes(hostname)) {
   //         set.add(url)
